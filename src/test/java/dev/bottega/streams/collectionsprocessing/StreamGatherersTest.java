@@ -48,8 +48,13 @@ public class StreamGatherersTest {
     public void windowSlidingProducesOverlappingWindows() {
         assertThat(NUMBERS.stream().gather(Gatherers.windowSliding(2)).toList())
                 .containsExactly(
-                        List.of(1, 2), List.of(2, 3), List.of(3, 4), List.of(4, 5),
-                        List.of(5, 6), List.of(6, 7), List.of(7, 8));
+                        List.of(1, 2),
+                        List.of(2, 3),
+                        List.of(3, 4),
+                        List.of(4, 5),
+                        List.of(5, 6),
+                        List.of(6, 7),
+                        List.of(7, 8));
     }
 
     @Test
