@@ -28,7 +28,7 @@ public class Bench {
     }
 
     // Task. Fun with Benchmark
-    // Bench test look vs. stream processing for similar cases
+    // Bench test loop vs. stream processing for similar cases
     // Bench test array list vs. hash set for contains
     // ... other ideas ?
 

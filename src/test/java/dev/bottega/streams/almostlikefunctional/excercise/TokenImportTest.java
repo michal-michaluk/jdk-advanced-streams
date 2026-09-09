@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static dev.bottega.streams.almostlikefunctional.excercise.TokenImport.BatchInserter;
 import static dev.bottega.streams.almostlikefunctional.excercise.TokenImport.ImportReport;
-import static dev.bottega.streams.almostlikefunctional.excercise.TokenImport.Outcome;
+
 import static dev.bottega.streams.almostlikefunctional.excercise.TokenImport.Problem;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -67,7 +67,7 @@ class TokenImportTest {
 
     @Test
     void insertsInBatchesOfAtMostBatchSize() {
-        List<List<Outcome<Token>>> submitted = new ArrayList<>();
+        List<List<Result<Token>>> submitted = new ArrayList<>();
         BatchInserter recordingInserter = batch -> {
             submitted.add(batch);
             return batch;
@@ -89,7 +89,7 @@ class TokenImportTest {
 
     @Test
     void passesParseProblemsThroughWithoutInsertion() {
-        List<List<Outcome<Token>>> submitted = new ArrayList<>();
+        List<List<Result<Token>>> submitted = new ArrayList<>();
         BatchInserter recordingInserter = batch -> {
             submitted.add(batch);
             return batch;
@@ -105,8 +105,8 @@ class TokenImportTest {
 
         // the window handed to the inserter carries the problems alongside the tokens
         assertThat(submitted).hasSize(1);
-        assertThat(submitted.getFirst()).filteredOn(outcome -> outcome instanceof Outcome.Err<?>).hasSize(2);
-        assertThat(submitted.getFirst()).filteredOn(outcome -> outcome instanceof Outcome.Ok<?>).hasSize(2);
+        assertThat(submitted.getFirst()).filteredOn(outcome -> outcome instanceof Result.Err<?>).hasSize(2);
+        assertThat(submitted.getFirst()).filteredOn(outcome -> outcome instanceof Result.Ok<?>).hasSize(2);
         assertThat(report.inserted()).isEqualTo(2);   // the two tokens
         assertThat(report.rejected()).isEqualTo(2);   // the two problems
     }
@@ -114,8 +114,8 @@ class TokenImportTest {
     @Test
     void reportIsImmutableAndUnmodifiable() {
         ImportReport report = ImportReport.empty()
-                .accept(Outcome.ok(new Token.Card("a1", "123", "Michal")))
-                .accept(Outcome.err(new Problem.Duplicate("a2")));
+                .accept(Result.ok(new Token.Card("a1", "123", "Michal")))
+                .accept(Result.err(new Problem.Duplicate("a2")));
 
         Assertions.assertThatExceptionOfType(UnsupportedOperationException.class)
                 .isThrownBy(() -> report.problems().add("boom"));
