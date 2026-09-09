@@ -1,5 +1,6 @@
 package dev.bottega.streams.collections;
 
+import org.assertj.core.api.Assertions;
 import org.openjdk.jmh.annotations.Benchmark;
 
 import java.util.ArrayList;
@@ -22,5 +23,13 @@ public class Bench {
         for (String s : base) {
             list.add(s);
         }
+
+        Assertions.assertThat(list).hasSize(10_000);
     }
+
+    // Task. Fun with Benchmark
+    // Bench test look vs. stream processing for similar cases
+    // Bench test array list vs. hash set for contains
+    // ... other ideas ?
+
 }
