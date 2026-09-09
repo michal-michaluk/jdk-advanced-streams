@@ -31,6 +31,10 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.20.2")
     // JMH: `collections/Bench.java` uses @Benchmark. Compile-time annotation only (benchmarks are not run).
     testImplementation("org.openjdk.jmh:jmh-core:1.32")
+    // Generate the JMH benchmark classes at compile time and provide the runtime generator
+    // so `./gradlew jmh` can actually execute `collections/Bench`.
+    testAnnotationProcessor("org.openjdk.jmh:jmh-generator-annprocess:1.32")
+    testRuntimeOnly("org.openjdk.jmh:jmh-generator-asm:1.32")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
@@ -77,6 +81,22 @@ tasks.jacocoTestCoverageVerification {
 
 tasks.check {
     dependsOn(tasks.jacocoTestCoverageVerification)
+}
+
+// Runs the JMH microbenchmark for collections/Bench via `./gradlew jmh`.
+// Override JMH args with -PjmhArgs="-f 1 -wi 3 -i 5 -r 1s -w 1s dev.bottega.streams.collections.Bench".
+val jmhArgs: List<String> = (findProperty("jmhArgs") as? String)
+    ?.split(' ')
+    ?.filter { it.isNotBlank() }
+    ?: listOf("-f", "1", "-wi", "5", "-i", "5", "-r", "1s", "-w", "1s", "dev.bottega.streams.collections.Bench")
+
+tasks.register<JavaExec>("jmh") {
+    group = "verification"
+    description = "Runs the JMH microbenchmark for collections/Bench."
+    dependsOn(tasks.testClasses)
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("org.openjdk.jmh.Main")
+    args(jmhArgs)
 }
 
 // Runs every demo (incl. preview + incubator) with the required JVM flags.
